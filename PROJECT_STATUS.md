@@ -17,6 +17,17 @@
 | Android: interface | ✅ typecheck + 7 testes de renderização (boas-vindas, procurando, lista, aprovação, conectado, mutado/reconectando, configurações) |
 | Releases/atualizações | ✅ **v0.1.0 publicada** em https://github.com/zyypj/micnexus/releases/tag/v0.1.0 (workflow Release verde, promovida a latest). Conferido: `latest.json` resolve, assinatura minisign do instalador válida para a chave pública do `tauri.conf.json`, APK assinado com a `release.keystore` (SHA-256 do certificado `b0ceb3f7…eb41`), API de releases responde v0.1.0 |
 
+## iPhone (2026-10-18)
+
+| Parte | Estado |
+|---|---|
+| Distribuição | `.ipa` **sem assinatura** gerado no CI (`macos-15`) e anexado às releases; instalação com **Sideloadly** + Apple ID grátis (7 dias) — docs/IOS.md |
+| Build iOS (XcodeGen + CocoaPods + RN 0.87) | ✅ compila no CI de primeira; `.ipa` inspecionado: bundle Hermes, extensão da Live Activity, App Intents, Info.plist (iOS 17, áudio/BLE em segundo plano, Bonjour, permissões) |
+| Windows: Wi‑Fi por Bonjour (mDNS legacy unicast) | ✅ testado com um iPhone simulado (`examples/fake_iphone.rs`): presença → `BYE idle` → o iPhone pede o PC → aprovação → 440 Hz / RMS 0,346 no cabo |
+| Windows: cabo do iPhone (usbmux) | ⚠️ protocolo testado contra um usbmuxd simulado; sem o serviço da Apple e sem iPhone aqui |
+| Windows: BLE (central GATT) | ⚠️ compila; Bluetooth deste PC desligado, sem iPhone — não exercitado |
+| Swift (Engine, Session, Capture, BLE, Live Activity) | ⚠️ compila; **não executado num iPhone** |
+
 ## Medições desta sessão (Windows, celular falso na mesma máquina)
 
 `cargo run --example headless` + `cargo run --example fake_phone -- 10 7`, gravando o lado
@@ -55,6 +66,9 @@ os segredos: docs/UPDATES.md.
   `?mock=...`.
 
 ## Próximas tarefas
+
+0. Instalar o `.ipa` num iPhone pelo Sideloadly e testar Wi‑Fi (permissão de rede local, Bonjour),
+   cabo (com o app Dispositivos Apple no PC), BLE, Live Activity e tela bloqueada.
 
 1. Rodar o APK num celular real: Wi‑Fi (descoberta, aprovação, conexão automática), cabo (abrir o
    app pelo adb, troca Wi‑Fi → cabo), Bluetooth (com o Bluetooth do PC ligado), notificação e

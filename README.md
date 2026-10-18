@@ -1,8 +1,9 @@
 # MicNexus
 
-Transforma o celular **Android** em microfone do PC **Windows**, por **Wi‑Fi**, **cabo USB** ou
-**Bluetooth** — conectando sozinho. Botão de mutar nos dois lados, app em segundo plano no
-celular com notificação permanente (só enquanto conectado) com **Mutar** e **Desconectar**.
+Transforma o celular **Android** ou **iPhone** em microfone do PC **Windows**, por **Wi‑Fi**,
+**cabo USB** ou **Bluetooth** — conectando sozinho. Botão de mutar nos dois lados, app em segundo
+plano no celular com notificação permanente (só enquanto conectado) com **Mutar** e
+**Desconectar** — no iPhone, uma Live Activity na tela de bloqueio e na Dynamic Island.
 Mesmo padrão e identidade visual do [Nexus](https://github.com/zyypj/nexus).
 
 ## Como funciona em uma frase
@@ -27,11 +28,15 @@ celular (Kotlin)  ── Wi‑Fi / USB (adb) / Bluetooth RFCOMM ──▶  PC (R
 Nenhuma configuração de firewall: no Wi‑Fi e no cabo é o PC que conecta no celular
 (detalhes em [docs/PROTOCOL.md](docs/PROTOCOL.md)).
 
+**iPhone:** instale o `micnexus-ios.ipa` da release com o **Sideloadly** e o seu Apple ID
+gratuito (vale 7 dias; renove pelo Sideloadly). Wi‑Fi por Bonjour, cabo pelos drivers da Apple
+(app Dispositivos Apple), Bluetooth por BLE — passo a passo em [docs/IOS.md](docs/IOS.md).
+
 ## Estrutura
 
 ```
 apps/desktop        Windows — Tauri 2 + Rust + React + TypeScript + Vite
-apps/mobile        Android — React Native + TypeScript + Kotlin
+apps/mobile         Android e iPhone — React Native + TypeScript + Kotlin (android/) e Swift (ios/)
 packages/protocol   constantes e formatos de estado compartilhados
 packages/ui         tokens visuais e ícones (mesma identidade do Nexus)
 scripts/            versão/release, ícones, adb empacotado
@@ -67,10 +72,10 @@ MICNEXUS_INTEROP=1 ./gradlew :app:testDebugUnitTest --tests '*InteropTest*'   # 
 ## Releases e atualizações automáticas
 
 `node scripts/release.mjs 0.2.0 && git push origin HEAD v0.2.0` publica uma GitHub Release com o
-instalador do Windows e o APK; os dois apps se atualizam a partir dela
+instalador do Windows, o APK e o `.ipa` do iPhone; Windows e Android se atualizam a partir dela
 ([docs/UPDATES.md](docs/UPDATES.md)).
 
 ## Documentação
 
-[Protocolo](docs/PROTOCOL.md) · [Windows](docs/WINDOWS.md) · [Android](docs/ANDROID.md) ·
+[Protocolo](docs/PROTOCOL.md) · [Windows](docs/WINDOWS.md) · [Android](docs/ANDROID.md) · [iPhone](docs/IOS.md) ·
 [Atualizações](docs/UPDATES.md) · [Status do projeto](PROJECT_STATUS.md)
