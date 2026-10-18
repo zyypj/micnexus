@@ -9,7 +9,7 @@ import type { EngineState, Pc } from '../src/native/MicNexus';
 
 const native = {
   getState: jest.fn(),
-  getPcs: jest.fn(async () => []),
+  getPcs: jest.fn(async (): Promise<Pc[]> => []),
   getSettings: jest.fn(async () => ({ autoConnect: true, noiseSuppression: true, gain: 1, lastPcId: null })),
   setSettings: jest.fn(async (p: object) => ({ autoConnect: true, noiseSuppression: true, gain: 1, lastPcId: null, ...p })),
   connect: jest.fn(),
@@ -25,7 +25,7 @@ const native = {
   removeListeners: jest.fn(),
 };
 NativeModules.MicNexus = native;
-(global as unknown as { fetch: unknown }).fetch = jest.fn(async () => ({ ok: false }));
+(globalThis as unknown as { fetch: unknown }).fetch = jest.fn(async () => ({ ok: false }));
 
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
