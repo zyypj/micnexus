@@ -70,4 +70,10 @@ for (const [d, size] of Object.entries(densities)) {
 }
 write("apps/mobile/src/assets/logo.png", png(logo, 256));
 
+// ----------------------------------------------------------------- iOS --
+// Full-bleed and opaque: iOS applies its own rounded mask.
+const square = logo
+  .replace('<rect x="32" y="32" width="960" height="960" rx="224" fill="url(#g)"/>', '<rect width="1024" height="1024" fill="url(#g)"/>');
+write("apps/mobile/ios/MicNexus/Images.xcassets/AppIcon.appiconset/AppIcon-1024.png", png(square, 1024));
+
 console.log("icons written");

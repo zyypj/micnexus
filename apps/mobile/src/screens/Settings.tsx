@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { PanResponder, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+
+const ios = Platform.OS === 'ios';
 import { MicNexus, type EngineSettings } from '../native/MicNexus';
 import { useUpdate, installUpdate, checkForUpdate } from '../lib/updater';
 import { Icon, IconButton, Toggle } from '../ui/components';
@@ -51,19 +53,42 @@ export function Settings({ onClose, connected }: { onClose: () => void; connecte
         <View style={[common.card, styles.group, { paddingVertical: 14 }]}>
           <View style={[common.row, { gap: 12 }]}>
             <Icon name="zap" size={20} color={colors.highlight} />
-            <Text style={[common.muted, { flex: 1 }]}>
-              Adicione o bloco <Text style={{ color: colors.text, fontWeight: '700' }}>MicNexus</Text> nas Configurações rápidas
-              (puxe a barra de notificações e toque no lápis) para mutar sem abrir o app.
-            </Text>
+            {ios ? (
+              <Text style={[common.muted, { flex: 1 }]}>
+                Enquanto conectado, <Text style={{ color: colors.text, fontWeight: '700' }}>Mutar</Text> e{' '}
+                <Text style={{ color: colors.text, fontWeight: '700' }}>Desconectar</Text> ficam na tela de bloqueio e na
+                Dynamic Island. Se não aparecerem, ative “Atividades ao Vivo” do MicNexus nos Ajustes.
+              </Text>
+            ) : (
+              <Text style={[common.muted, { flex: 1 }]}>
+                Adicione o bloco <Text style={{ color: colors.text, fontWeight: '700' }}>MicNexus</Text> nas Configurações rápidas
+                (puxe a barra de notificações e toque no lápis) para mutar sem abrir o app.
+              </Text>
+            )}
           </View>
         </View>
 
-        <Text style={common.section}>Bluetooth</Text>
-        <Pressable style={[common.card, styles.link]} onPress={() => MicNexus.openBluetoothSettings()}>
-          <Icon name="bluetooth" size={20} color={colors.textMuted} />
-          <Text style={[common.text, { flex: 1 }]}>Parear com um PC</Text>
-          <Icon name="external" size={18} color={colors.textFaint} />
-        </Pressable>
+        {ios ? (
+          <>
+            <Text style={common.section}>Instalação</Text>
+            <View style={[common.card, styles.link]}>
+              <Icon name="info" size={20} color={colors.textMuted} />
+              <Text style={[common.muted, { flex: 1 }]}>
+                Instalado pelo Sideloadly com um Apple ID grátis, o app vale por 7 dias: reinstale (ou use o “auto-refresh”
+                do Sideloadly) para renovar.
+              </Text>
+            </View>
+          </>
+        ) : (
+          <>
+            <Text style={common.section}>Bluetooth</Text>
+            <Pressable style={[common.card, styles.link]} onPress={() => MicNexus.openBluetoothSettings()}>
+              <Icon name="bluetooth" size={20} color={colors.textMuted} />
+              <Text style={[common.text, { flex: 1 }]}>Parear com um PC</Text>
+              <Icon name="external" size={18} color={colors.textFaint} />
+            </Pressable>
+          </>
+        )}
 
         <Text style={common.section}>Sobre</Text>
         <View style={[common.card, styles.link]}>

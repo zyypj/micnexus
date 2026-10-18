@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, StyleSheet, Text, Vibration, View } from 'react-native';
+import { Animated, Platform, Pressable, StyleSheet, Text, Vibration, View } from 'react-native';
 import { LEVEL_EVENT, MicNexus, events, type EngineState } from '../native/MicNexus';
 import { Banner, Chip, Gradient, Icon, SecondaryButton } from '../ui/components';
 import { colors, common, space } from '../ui/theme';
@@ -58,7 +58,9 @@ export function Connected({ state }: { state: EngineState }) {
       </View>
 
       <Text style={[common.faint, styles.hint]}>
-        Pode sair do app: a notificação mostra o microfone e tem os botões de mutar e desconectar.
+        {Platform.OS === 'ios'
+          ? 'Pode sair do app: Mutar e Desconectar ficam na tela de bloqueio e na Dynamic Island.'
+          : 'Pode sair do app: a notificação mostra o microfone e tem os botões de mutar e desconectar.'}
       </Text>
       <SecondaryButton title="Desconectar" icon="power" danger onPress={() => MicNexus.disconnect()} />
     </View>

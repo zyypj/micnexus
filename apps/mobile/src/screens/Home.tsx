@@ -1,5 +1,7 @@
 import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+
+const ios = Platform.OS === 'ios';
 import { MicNexus, type EngineState, type Pc } from '../native/MicNexus';
 import { Banner, Chip, Gradient, Icon, Pulse, SecondaryButton } from '../ui/components';
 import { colors, common, radius, space } from '../ui/theme';
@@ -37,8 +39,17 @@ export function Home({ state, pcs, onAskBluetooth }: { state: EngineState; pcs: 
             <Text style={common.text}>Procurando…</Text>
           </View>
           <Tip icon="wifi" color={colors.wifi} title="Wi‑Fi" text="Celular e PC na mesma rede, com o MicNexus aberto no PC." />
-          <Tip icon="usb" color="#c4a8ff" title="Cabo USB" text="Ligue o cabo com a depuração USB ativa: o PC abre o app e conecta sozinho." />
-          <Tip icon="bluetooth" color="#9aa8ff" title="Bluetooth" text="Pareie o celular com o PC uma vez nas configurações de Bluetooth." />
+          {ios ? (
+            <>
+              <Tip icon="usb" color="#c4a8ff" title="Cabo USB" text="Ligue o cabo com este app aberto. No PC é preciso o app Dispositivos Apple (o mesmo que o Sideloadly usa)." />
+              <Tip icon="bluetooth" color="#9aa8ff" title="Bluetooth" text="Toque em “Conectar por Bluetooth” abaixo, com o Bluetooth do PC ligado." />
+            </>
+          ) : (
+            <>
+              <Tip icon="usb" color="#c4a8ff" title="Cabo USB" text="Ligue o cabo com a depuração USB ativa: o PC abre o app e conecta sozinho." />
+              <Tip icon="bluetooth" color="#9aa8ff" title="Bluetooth" text="Pareie o celular com o PC uma vez nas configurações de Bluetooth." />
+            </>
+          )}
         </View>
       ) : (
         <View style={{ gap: 10 }}>
@@ -48,7 +59,13 @@ export function Home({ state, pcs, onAskBluetooth }: { state: EngineState; pcs: 
         </View>
       )}
 
-      {!state.bluetoothPermission ? (
+      {ios ? (
+        <Pressable style={styles.btHint} disabled={busy} onPress={() => MicNexus.connect('ble:any', 'bluetooth')}>
+          <Icon name="bluetooth" size={18} color={colors.accentHover} />
+          <Text style={styles.btHintText}>Conectar por Bluetooth ao PC mais próximo</Text>
+          <Icon name="chevronRight" size={18} color={colors.textFaint} />
+        </Pressable>
+      ) : !state.bluetoothPermission ? (
         <Pressable style={styles.btHint} onPress={onAskBluetooth}>
           <Icon name="bluetooth" size={18} color={colors.accentHover} />
           <Text style={styles.btHintText}>Permitir Bluetooth para ver os PCs pareados</Text>
@@ -100,7 +117,9 @@ function PcRow({ pc, disabled }: { pc: Pc; disabled: boolean }) {
       ? pc.last
         ? 'Último usado · toque para conectar'
         : 'Toque para conectar'
-      : 'Pareado · toque para conectar pelo Bluetooth';
+      : ios
+        ? 'Toque para conectar pelo Bluetooth'
+        : 'Pareado · toque para conectar pelo Bluetooth';
   return (
     <Pressable
       disabled={disabled}
@@ -119,7 +138,7 @@ function PcRow({ pc, disabled }: { pc: Pc; disabled: boolean }) {
         </Text>
         <View style={[common.row, { gap: 6, marginTop: 6 }]}>
           {pc.wifi && <Chip icon="wifi" label="Wi‑Fi" color={colors.wifi} />}
-          {pc.bluetooth && <Chip icon="bluetooth" label="Bluetooth" color="#9aa8ff" />}
+          {pc.bluetooth && !ios && <Chip icon="bluetooth" label="Bluetooth" color="#9aa8ff" />}
         </View>
       </View>
       {pc.wifi && pc.bluetooth ? (

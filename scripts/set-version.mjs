@@ -34,6 +34,8 @@ const targets = [
   ["apps/mobile/package.json", /"version": "([^"]+)"/, version],
   ["apps/mobile/android/app/build.gradle", /versionName "([^"]+)"/, version],
   ["apps/mobile/android/app/build.gradle", /versionCode (\d+)/, String(versionCode)],
+  ["apps/mobile/ios/project.yml", /MARKETING_VERSION: "([^"]+)"/, version],
+  ["apps/mobile/ios/project.yml", /CURRENT_PROJECT_VERSION: "([^"]+)"/, String(versionCode)],
 ];
 
 let mismatches = 0;

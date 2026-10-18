@@ -25,7 +25,7 @@ export interface Pc {
   name: string;
   /** IP when found on Wi‑Fi right now. */
   wifi: string | null;
-  /** MAC when paired over Bluetooth. */
+  /** MAC when paired over Bluetooth (Android); "ble" on iPhone (any PC may answer over BLE). */
   bluetooth: string | null;
   busy: boolean;
   /** The PC used last time. */
@@ -53,7 +53,9 @@ interface Spec {
   openBluetoothSettings(): void;
   openAppSettings(): void;
   getAppVersion(): Promise<string>;
-  installUpdate(url: string, version: string): Promise<'permission' | 'downloading'>;
+  installUpdate(url: string, version: string): Promise<'permission' | 'downloading' | 'opened'>;
+  /** iOS only (Android uses PermissionsAndroid). */
+  requestPermissions?(): Promise<'granted' | 'denied' | 'blocked'>;
 }
 
 const mod: Spec | undefined = NativeModules.MicNexus;
@@ -77,6 +79,7 @@ export const MicNexus = {
   openAppSettings: () => mod?.openAppSettings(),
   getAppVersion: async () => native().getAppVersion(),
   installUpdate: async (url: string, version: string) => native().installUpdate(url, version),
+  requestPermissions: async () => (await native().requestPermissions?.()) ?? 'denied',
 };
 
 export const events = mod ? new NativeEventEmitter(NativeModules.MicNexus) : null;

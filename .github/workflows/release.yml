@@ -4,6 +4,7 @@
 # Release assets, consumed by the auto-updaters:
 #   MicNexus_<v>_x64-setup.exe (+ .sig), latest.json   -> Windows updater (tauri-plugin-updater)
 #   micnexus-android.apk                               -> Android updater
+#   micnexus-ios.ipa (unsigned)                        -> installed with Sideloadly (docs/IOS.md)
 #
 # Secrets:
 #   TAURI_SIGNING_PRIVATE_KEY, TAURI_SIGNING_PRIVATE_KEY_PASSWORD   (required, Windows updates)
@@ -121,8 +122,32 @@ jobs:
           cp apps/mobile/android/app/build/outputs/apk/release/app-release.apk micnexus-android.apk
           gh release upload "$GITHUB_REF_NAME" micnexus-android.apk --clobber
 
+  ios:
+    needs: prepare
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            apps/mobile/package-lock.json
+      - run: npm ci
+      - working-directory: apps/mobile
+        run: npm ci
+      - name: Tools
+        run: brew install xcodegen
+      - name: Build unsigned .ipa
+        run: bash apps/mobile/scripts/build-ipa.sh
+      - name: Upload
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$GITHUB_REF_NAME" apps/mobile/ios/build/micnexus-ios.ipa --clobber
+
   publish:
-    needs: [prepare, desktop, android]
+    needs: [prepare, desktop, android, ios]
     runs-on: ubuntu-latest
     steps:
       - name: Promote to latest (only now do the auto-updaters see it)

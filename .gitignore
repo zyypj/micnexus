@@ -19,3 +19,8 @@ apps/desktop/src-tauri/resources/adb/
 !.vscode/extensions.json
 .idea/
 *.tsbuildinfo
+apps/mobile/ios/Pods/
+apps/mobile/ios/build/
+apps/mobile/ios/MicNexus.xcodeproj/
+apps/mobile/ios/MicNexus.xcworkspace/
+apps/mobile/ios/.xcode.env.local

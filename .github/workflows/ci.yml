@@ -94,3 +94,28 @@ jobs:
         with:
           name: micnexus-android-apk
           path: apps/mobile/android/app/build/outputs/apk/release/*.apk
+
+  ios:
+    name: iOS app (unsigned .ipa for Sideloadly)
+    runs-on: macos-15
+    needs: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            apps/mobile/package-lock.json
+      - run: npm ci
+      - working-directory: apps/mobile
+        run: npm ci
+      - name: Tools
+        run: brew install xcodegen
+      - name: Build unsigned .ipa
+        run: bash apps/mobile/scripts/build-ipa.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: micnexus-ios-ipa
+          path: apps/mobile/ios/build/micnexus-ios.ipa

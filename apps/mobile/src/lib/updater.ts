@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
-import { APK_ASSET, GITHUB_REPO } from '../buildInfo';
+import { Platform } from 'react-native';
+import { APK_ASSET, GITHUB_REPO, IPA_ASSET } from '../buildInfo';
 import { MicNexus, UPDATE_ERROR_EVENT, events } from '../native/MicNexus';
 
 /**
@@ -43,6 +44,7 @@ export function isNewer(tag: string, current: string): boolean {
 }
 
 interface GithubRelease {
+  html_url: string;
   tag_name: string;
   draft: boolean;
   prerelease: boolean;
@@ -61,9 +63,11 @@ export async function checkForUpdate(): Promise<void> {
     });
     if (!res.ok) return;
     const rel = (await res.json()) as GithubRelease;
-    const asset = rel.assets.find((a) => a.name === APK_ASSET);
+    const ios = Platform.OS === 'ios';
+    const asset = rel.assets.find((a) => a.name === (ios ? IPA_ASSET : APK_ASSET));
     if (rel.draft || rel.prerelease || !asset || !isNewer(rel.tag_name, current)) return;
-    set({ available: { version: rel.tag_name.replace(/^v/, ''), url: asset.browser_download_url } });
+    // iOS: no self-install (Sideloadly from the PC); open the release page instead.
+    set({ available: { version: rel.tag_name.replace(/^v/, ''), url: ios ? rel.html_url : asset.browser_download_url } });
   } catch {
     // offline: next check
   } finally {

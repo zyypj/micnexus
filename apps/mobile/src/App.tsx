@@ -14,6 +14,7 @@ import { colors, common, radius, space } from './ui/theme';
 const sdk = typeof Platform.Version === 'number' ? Platform.Version : 0;
 
 async function requestPermissions(): Promise<'granted' | 'denied' | 'blocked'> {
+  if (Platform.OS === 'ios') return MicNexus.requestPermissions();
   const wanted: Permission[] = [PermissionsAndroid.PERMISSIONS.RECORD_AUDIO];
   if (sdk >= 33) wanted.push(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
   if (sdk >= 31) wanted.push(PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT);
@@ -24,6 +25,7 @@ async function requestPermissions(): Promise<'granted' | 'denied' | 'blocked'> {
 }
 
 async function requestBluetooth() {
+  if (Platform.OS === 'ios') return MicNexus.openBluetoothSettings(); // first use asks for permission
   if (sdk >= 31) await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT);
   MicNexus.refresh();
 }

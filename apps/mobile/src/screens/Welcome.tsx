@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, Platform, StyleSheet, Text, View } from 'react-native';
 import { PrimaryButton, SecondaryButton, Icon } from '../ui/components';
 import { colors, common, space } from '../ui/theme';
 
@@ -13,8 +13,17 @@ export function Welcome({ onAllow, denied, onSettings }: { onAllow: () => void; 
         Funciona pelo Wi‑Fi, pelo cabo USB ou pelo Bluetooth, com o app em segundo plano.
       </Text>
       <Step icon="mic" title="Microfone" text="Para enviar a sua voz ao PC. Só é usado enquanto estiver conectado." />
-      <Step icon="info" title="Notificações" text="Mostram que o microfone está ligado, com os botões de mutar e desconectar." />
-      <Step icon="bluetooth" title="Dispositivos próximos" text="Para conectar a um PC pareado pelo Bluetooth (opcional)." />
+      {Platform.OS === 'ios' ? (
+        <>
+          <Step icon="wifi" title="Rede local" text="Para o PC encontrar este iPhone no Wi‑Fi (o iOS pergunta na primeira conexão)." />
+          <Step icon="info" title="Tela de bloqueio" text="Enquanto conectado, Mutar e Desconectar aparecem lá e na Dynamic Island." />
+        </>
+      ) : (
+        <>
+          <Step icon="info" title="Notificações" text="Mostram que o microfone está ligado, com os botões de mutar e desconectar." />
+          <Step icon="bluetooth" title="Dispositivos próximos" text="Para conectar a um PC pareado pelo Bluetooth (opcional)." />
+        </>
+      )}
       <View style={{ height: 28 }} />
       {denied ? (
         <>
@@ -30,7 +39,7 @@ export function Welcome({ onAllow, denied, onSettings }: { onAllow: () => void; 
   );
 }
 
-function Step({ icon, title, text }: { icon: 'mic' | 'info' | 'bluetooth'; title: string; text: string }) {
+function Step({ icon, title, text }: { icon: 'mic' | 'info' | 'bluetooth' | 'wifi'; title: string; text: string }) {
   return (
     <View style={styles.step}>
       <View style={styles.stepIcon}>
