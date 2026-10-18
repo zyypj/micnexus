@@ -1,6 +1,6 @@
 # PROJECT_STATUS
 
-Última atualização: 2026-10-18 (versão 0.1.0, ainda não publicada).
+Última atualização: 2026-10-18 (versão 0.1.0 publicada).
 
 ## Estado
 
@@ -15,7 +15,7 @@
 | Windows: interface | ✅ revisada no navegador com o backend simulado e **no app real** (build de release, WebView2 via CDP): aguardando → aprovação → ao vivo com nível da voz → mutado (o pedido de mute chegou ao celular) |
 | Android: Kotlin (Engine, Session, captura, serviço, notificação, bloco rápido) | ✅ compila; `Session` testada em JVM contra um PC roteirizado; ⚠️ **não executado num aparelho** |
 | Android: interface | ✅ typecheck + 7 testes de renderização (boas-vindas, procurando, lista, aprovação, conectado, mutado/reconectando, configurações) |
-| Releases/atualizações | ⚠️ workflows prontos; repositório `zyypj/micnexus` e segredos **ainda não criados** |
+| Releases/atualizações | ✅ **v0.1.0 publicada** em https://github.com/zyypj/micnexus/releases/tag/v0.1.0 (workflow Release verde, promovida a latest). Conferido: `latest.json` resolve, assinatura minisign do instalador válida para a chave pública do `tauri.conf.json`, APK assinado com a `release.keystore` (SHA-256 do certificado `b0ceb3f7…eb41`), API de releases responde v0.1.0 |
 
 ## Medições desta sessão (Windows, celular falso na mesma máquina)
 
@@ -60,4 +60,3 @@ os segredos: docs/UPDATES.md.
    app pelo adb, troca Wi‑Fi → cabo), Bluetooth (com o Bluetooth do PC ligado), notificação e
    bloco rápido com a tela desligada; medir o atraso real.
 2. Testar o instalador NSIS e a instalação do VB-CABLE num Windows limpo.
-3. Criar o repositório `zyypj/micnexus`, configurar os segredos e publicar a v0.1.0.
