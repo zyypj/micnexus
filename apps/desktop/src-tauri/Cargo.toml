@@ -27,11 +27,17 @@ tauri-plugin-updater = "2"
 # Pure Rust (no C toolchain): Bluetooth sessions are Opus.
 opus-decoder = "0.1"
 uuid = { version = "1", features = ["v4"] }
+socket2 = "0.6"
+plist = "1"
 
 [target.'cfg(windows)'.dependencies]
 windows-core = "0.62"
 windows = { version = "0.62", features = [
+    "Devices_Bluetooth",
+    "Devices_Bluetooth_Advertisement",
+    "Devices_Bluetooth_GenericAttributeProfile",
     "Devices_Radios",
+    "Storage_Streams",
     "Foundation_Collections",
     "Win32_Devices_Bluetooth",
     "Win32_Devices_FunctionDiscovery",

@@ -304,7 +304,7 @@ mod win {
                 Ok(Some(stream)) => {
                     let core = core.clone();
                     let _ = std::thread::Builder::new().name("bt-session".into()).spawn(move || {
-                        core.serve(Box::new(stream), Transport::Bluetooth, "bluetooth".into());
+                        core.serve(Box::new(stream), Transport::Bluetooth, "bluetooth".into(), true);
                     });
                 }
                 Ok(None) => std::thread::sleep(Duration::from_millis(250)),

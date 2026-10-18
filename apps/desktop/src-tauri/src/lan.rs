@@ -108,7 +108,7 @@ fn run(core: Arc<Core>) {
                 let _ = std::thread::Builder::new().name("lan-connect".into()).spawn(move || {
                     if let Ok(stream) = TcpStream::connect_timeout(&target, Duration::from_secs(3)) {
                         let _ = stream.set_nodelay(true);
-                        core.serve(Box::new(stream), Transport::Wifi, target.ip().to_string());
+                        core.serve(Box::new(stream), Transport::Wifi, target.ip().to_string(), false);
                     }
                     connecting.lock().unwrap().remove(&id);
                 });

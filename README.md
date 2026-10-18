@@ -31,7 +31,7 @@ Nenhuma configuração de firewall: no Wi‑Fi e no cabo é o PC que conecta no 
 
 ```
 apps/desktop        Windows — Tauri 2 + Rust + React + TypeScript + Vite
-apps/android        Android — React Native + TypeScript + Kotlin
+apps/mobile        Android — React Native + TypeScript + Kotlin
 packages/protocol   constantes e formatos de estado compartilhados
 packages/ui         tokens visuais e ícones (mesma identidade do Nexus)
 scripts/            versão/release, ícones, adb empacotado
@@ -43,7 +43,7 @@ docs/               protocolo, Windows, Android, atualizações
 ```bash
 npm install
 npm run desktop:dev                   # app do Windows (Tauri)
-cd apps/android && npm install && npm run android   # app Android (aparelho com depuração USB)
+cd apps/mobile && npm install && npm run android   # app Android (aparelho com depuração USB)
 ```
 
 Sem o Tauri, `npx vite apps/desktop` abre a interface do Windows no navegador com um backend
@@ -54,14 +54,14 @@ simulado (`?mock=idle|connected|muted|pending|nocable|usb-auth`).
 ```bash
 cd apps/desktop/src-tauri && cargo test && cargo clippy --all-targets -- -D warnings
 npm run typecheck
-cd apps/android && npm run typecheck && npx jest
-cd apps/android/android && ./gradlew :app:testDebugUnitTest   # protocolo e sessão em Kotlin
+cd apps/mobile && npm run typecheck && npx jest
+cd apps/mobile/android && ./gradlew :app:testDebugUnitTest   # protocolo e sessão em Kotlin
 # ponta a ponta sem celular: PC sem interface + celular falso na mesma máquina,
 # gravando o lado "microfone" do cabo virtual
 cargo run --example headless -- 15     # terminal 1
 cargo run --example fake_phone -- 10 7 # terminal 2 (tom de 440 Hz, muta aos 7 s)
 # ou a Session Kotlin real no lugar do celular falso:
-MICNEXUS_INTEROP=1 ./gradlew :app:testDebugUnitTest --tests '*InteropTest*'   # em apps/android/android
+MICNEXUS_INTEROP=1 ./gradlew :app:testDebugUnitTest --tests '*InteropTest*'   # em apps/mobile/android
 ```
 
 ## Releases e atualizações automáticas

@@ -206,6 +206,7 @@ fn track(core: Arc<Core>, resources: Option<PathBuf>, devices: Arc<Mutex<Option<
                         state: "no-adb",
                         devices: Vec::new(),
                         error: None,
+                        apple: false,
                     });
                     std::thread::sleep(Duration::from_secs(10));
                 }
@@ -283,7 +284,7 @@ fn manage(core: Arc<Core>, devices: Arc<Mutex<Option<Vec<AdbDevice>>>>) {
                     TcpStream::connect_timeout(&SocketAddr::from((Ipv4Addr::LOCALHOST, port)), Duration::from_secs(2))
                 {
                     let _ = stream.set_nodelay(true);
-                    device_id = core.serve(Box::new(stream), Transport::Usb, serial.clone());
+                    device_id = core.serve(Box::new(stream), Transport::Usb, serial.clone(), true);
                 }
                 results.lock().unwrap().push((serial, device_id));
                 connecting.store(false, Ordering::Relaxed);
@@ -307,6 +308,7 @@ fn manage(core: Arc<Core>, devices: Arc<Mutex<Option<Vec<AdbDevice>>>>) {
             state: "ready",
             devices: view,
             error: None,
+            apple: false,
         });
     }
 }

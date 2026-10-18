@@ -21,7 +21,7 @@ export function mockBackend(): Backend {
     pc: { id: "pc", name: "TUF-DE-SAMUEL", version: "0.1.0" },
     wifi: { ok: true, addresses: ["192.168.0.12"], phones: [], error: null },
     bluetooth: { state: "off", error: null },
-    usb: { state: "ready", devices: [], error: null },
+    usb: { state: "ready", devices: [], error: null, apple: false },
     session: null,
     pending: null,
     output: scenario === "nocable" ? null : outputs[0]!,

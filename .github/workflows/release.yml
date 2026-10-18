@@ -92,9 +92,9 @@ jobs:
           cache: npm
           cache-dependency-path: |
             package-lock.json
-            apps/android/package-lock.json
+            apps/mobile/package-lock.json
       - run: npm ci
-      - working-directory: apps/android
+      - working-directory: apps/mobile
         run: npm ci
       - uses: gradle/actions/setup-gradle@v4
       - name: Signing key
@@ -108,7 +108,7 @@ jobs:
             echo "::warning::ANDROID_KEYSTORE_BASE64 not set: the APK is signed with the public debug key"
           fi
       - name: Assemble release APK
-        working-directory: apps/android/android
+        working-directory: apps/mobile/android
         env:
           MICNEXUS_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           MICNEXUS_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -118,7 +118,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp apps/android/android/app/build/outputs/apk/release/app-release.apk micnexus-android.apk
+          cp apps/mobile/android/app/build/outputs/apk/release/app-release.apk micnexus-android.apk
           gh release upload "$GITHUB_REF_NAME" micnexus-android.apk --clobber
 
   publish:

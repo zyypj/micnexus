@@ -80,7 +80,7 @@ pub struct BluetoothStatus {
 pub struct UsbDevice {
     pub serial: String,
     pub model: String,
-    /// "device" | "unauthorized" | "offline" | "no-app"
+    /// "device" | "unauthorized" | "offline" | "no-app" | "closed" (iPhone: app not open)
     pub state: String,
     pub forwarded: bool,
 }
@@ -88,10 +88,13 @@ pub struct UsbDevice {
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UsbStatus {
-    /// "ready" | "no-adb" | "error"
+    /// "ready" | "no-adb" | "error" (Android, through adb)
     pub state: &'static str,
+    /// Android phones (adb) and iPhones (usbmux).
     pub devices: Vec<UsbDevice>,
     pub error: Option<String>,
+    /// Apple Mobile Device Service is running (iPhones over USB possible).
+    pub apple: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -201,6 +204,10 @@ struct Status {
     cable_install: &'static str,
     outputs: Vec<devices::Endpoint>,
     is_default_mic: bool,
+    /// iPhones found over Bonjour (merged into `wifi.phones`).
+    bonjour: Vec<LanPhone>,
+    /// iPhones on USB (usbmux) and whether Apple's service runs; merged into `usb`.
+    apple_usb: (bool, Vec<UsbDevice>),
 }
 
 pub struct Core {
@@ -242,9 +249,12 @@ impl Core {
                     state: "no-adb",
                     devices: Vec::new(),
                     error: None,
+                    apple: false,
                 },
                 cable_install: "idle",
                 outputs: Vec::new(),
+                bonjour: Vec::new(),
+                apple_usb: (false, Vec::new()),
                 is_default_mic: false,
             }),
             session: Mutex::new(None),
@@ -330,6 +340,16 @@ impl Core {
         }
     }
 
+    pub fn set_bonjour_phones(&self, phones: Vec<LanPhone>) {
+        let mut st = self.status.lock().unwrap();
+        if st.bonjour == phones {
+            return;
+        }
+        st.bonjour = phones;
+        drop(st);
+        self.emit_state();
+    }
+
     pub fn set_bluetooth(&self, state: &'static str, error: Option<String>) {
         let mut st = self.status.lock().unwrap();
         if st.bluetooth.state == state && st.bluetooth.error == error {
@@ -344,6 +364,17 @@ impl Core {
         let mut st = self.status.lock().unwrap();
         let changed = serde_json::to_string(&st.usb).ok() != serde_json::to_string(&usb).ok();
         st.usb = usb;
+        drop(st);
+        if changed {
+            self.emit_state();
+        }
+    }
+
+    pub fn set_apple_usb(&self, available: bool, devices: Vec<UsbDevice>) {
+        let mut st = self.status.lock().unwrap();
+        let changed = st.apple_usb.0 != available
+            || serde_json::to_string(&st.apple_usb.1).ok() != serde_json::to_string(&devices).ok();
+        st.apple_usb = (available, devices);
         drop(st);
         if changed {
             self.emit_state();
@@ -448,9 +479,24 @@ impl Core {
                 name: self.pc_name(),
                 version: self.version.clone(),
             },
-            wifi: st.wifi.clone(),
+            wifi: {
+                let mut w = st.wifi.clone();
+                let extra: Vec<LanPhone> = st
+                    .bonjour
+                    .iter()
+                    .filter(|p| !w.phones.iter().any(|q| q.id == p.id))
+                    .cloned()
+                    .collect();
+                w.phones.extend(extra);
+                w
+            },
             bluetooth: st.bluetooth.clone(),
-            usb: st.usb.clone(),
+            usb: {
+                let mut u = st.usb.clone();
+                u.apple = st.apple_usb.0;
+                u.devices.extend(st.apple_usb.1.iter().cloned());
+                u
+            },
             session,
             pending,
             output,
@@ -592,7 +638,16 @@ impl Core {
 
     /// Serves one phone connection until it ends (blocks; run on its own
     /// thread). Returns the phone's id when it introduced itself.
-    pub fn serve(self: &Arc<Self>, mut conn: Box<dyn Conn>, transport: Transport, address: String) -> Option<String> {
+    ///
+    /// `physical`: the link itself proves the user's intent (USB cable, a
+    /// Bluetooth pairing made in the OS); otherwise a new phone needs approval.
+    pub fn serve(
+        self: &Arc<Self>,
+        mut conn: Box<dyn Conn>,
+        transport: Transport,
+        address: String,
+        physical: bool,
+    ) -> Option<String> {
         let _ = conn.set_write_timeout(Some(Duration::from_secs(5)));
         let (tx, rx) = mpsc::channel::<Msg>();
         let reader = match conn.try_clone_box() {
@@ -620,7 +675,7 @@ impl Core {
             Err(_) => None,
         };
         let device_id = match reader {
-            Some(_) => self.handshake(&mut conn, transport, &address, tx, &rx),
+            Some(_) => self.handshake(&mut conn, transport, &address, physical, tx, &rx),
             None => None,
         };
         conn.shutdown();
@@ -635,6 +690,7 @@ impl Core {
         conn: &mut Box<dyn Conn>,
         transport: Transport,
         address: &str,
+        physical: bool,
         tx: Sender<Msg>,
         rx: &mpsc::Receiver<Msg>,
     ) -> Option<String> {
@@ -676,8 +732,8 @@ impl Core {
             return bye(conn, "busy");
         }
 
-        // Cable and Bluetooth imply physical access/pairing; Wi‑Fi asks once.
-        if transport == Transport::Wifi && !self.is_trusted(&hello.id) {
+        // Cable and OS-level Bluetooth pairing imply physical access; the rest asks once.
+        if !physical && !self.is_trusted(&hello.id) {
             {
                 let mut pending = self.pending.lock().unwrap();
                 if pending.is_some() {

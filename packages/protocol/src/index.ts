@@ -9,6 +9,11 @@ export const PHONE_PORT = 47820;
 export const DISCOVERY_PORT = 47821;
 export const BLUETOOTH_UUID = "a3c8e0f2-5b17-4d9a-8e61-0c4f2b9d7a15";
 export const ANDROID_PACKAGE = "app.micnexus.android";
+export const IOS_BUNDLE_ID = "app.micnexus.ios";
+export const BONJOUR_TYPE = "_micnexus._tcp";
+export const BLE_SERVICE = "a3c8e0f2-5b17-4d9a-8e61-0c4f2b9d7a16";
+export const BLE_RX = "a3c8e0f2-5b17-4d9a-8e61-0c4f2b9d7a17";
+export const BLE_TX = "a3c8e0f2-5b17-4d9a-8e61-0c4f2b9d7a18";
 
 export type Transport = "wifi" | "usb" | "bluetooth";
 export type Codec = "pcm16" | "opus";
@@ -24,8 +29,9 @@ export const TRANSPORT_LABEL: Record<Transport, string> = {
 export interface UsbDevice {
   serial: string;
   model: string;
-  /** adb state, plus "no-app" when MicNexus is not installed on the phone. */
-  state: "device" | "unauthorized" | "offline" | "no-app";
+  /** adb state, plus "no-app" when MicNexus is not installed on the phone,
+   * and "closed" for an iPhone (usbmux) where the app is not open. */
+  state: "device" | "unauthorized" | "offline" | "no-app" | "closed";
   /** `adb reverse` is in place: the phone can reach the PC through the cable. */
   forwarded: boolean;
 }
@@ -75,7 +81,8 @@ export interface DesktopState {
   /** The PC finds phones by broadcast and connects to them (no firewall rule needed). */
   wifi: { ok: boolean; addresses: string[]; phones: LanPhone[]; error: string | null };
   bluetooth: { state: "ready" | "off" | "unsupported" | "error"; error: string | null };
-  usb: { state: "ready" | "no-adb" | "error"; devices: UsbDevice[]; error: string | null };
+  /** Android over adb, iPhones over usbmux (`apple`: Apple's USB service is installed). */
+  usb: { state: "ready" | "no-adb" | "error"; devices: UsbDevice[]; error: string | null; apple: boolean };
   session: DesktopSession | null;
   pending: PendingDevice | null;
   /** Where the phone's audio goes (normally a virtual cable's input). */

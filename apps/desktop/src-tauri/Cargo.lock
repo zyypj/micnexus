@@ -2209,8 +2209,10 @@ name = "micnexus-desktop"
 version = "0.1.0"
 dependencies = [
  "opus-decoder",
+ "plist",
  "serde",
  "serde_json",
+ "socket2",
  "tauri",
  "tauri-build",
  "tauri-plugin-autostart",

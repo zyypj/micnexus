@@ -7,7 +7,7 @@ captura, notificação e o bloco de Configurações rápidas.
 ## Estrutura
 
 ```
-apps/android/
+apps/mobile/
   src/
     App.tsx                  permissões, cabeçalho, navegação simples
     screens/Welcome.tsx      primeira abertura (microfone, notificações, dispositivos próximos)
@@ -50,7 +50,7 @@ apps/android/
 Pré-requisitos: Node 22+, JDK 17, Android SDK (platform 36/37, build-tools 37, NDK 27.1).
 
 ```bash
-cd apps/android
+cd apps/mobile
 npm install
 npm run typecheck && npx jest
 cd android

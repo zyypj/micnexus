@@ -14,7 +14,7 @@ use std::{
 use micnexus_desktop_lib::{
     adb, bluetooth,
     core::{Core, Event},
-    lan,
+    lan, mdns,
     settings::Store,
 };
 
@@ -62,6 +62,7 @@ fn main() {
         });
     }
     lan::start(core.clone());
+    mdns::start(core.clone());
     bluetooth::start(core.clone());
     adb::start(core.clone(), None);
 

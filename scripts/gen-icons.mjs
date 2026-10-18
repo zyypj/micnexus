@@ -61,13 +61,13 @@ write(`${icons}/tray-live.png`, png(tray("url(#g)", MIC, '<circle cx="19.5" cy="
 write(`${icons}/tray-muted.png`, png(tray("#f4506b", MIC_OFF), 64));
 
 // ------------------------------------------------------------- Android --
-const res = "apps/android/android/app/src/main/res";
+const res = "apps/mobile/android/app/src/main/res";
 const densities = { mdpi: 48, hdpi: 72, xhdpi: 96, xxhdpi: 144, xxxhdpi: 192 };
 const round = logo.replace('rx="224"', 'rx="480"');
 for (const [d, size] of Object.entries(densities)) {
   write(`${res}/mipmap-${d}/ic_launcher.png`, png(logo, size));
   write(`${res}/mipmap-${d}/ic_launcher_round.png`, png(round, size));
 }
-write("apps/android/src/assets/logo.png", png(logo, 256));
+write("apps/mobile/src/assets/logo.png", png(logo, 256));
 
 console.log("icons written");

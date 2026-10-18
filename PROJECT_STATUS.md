@@ -48,7 +48,7 @@ os segredos: docs/UPDATES.md.
 
 - Rust: `CARGO_TARGET_DIR=D:/nexus-build/target-micnexus`.
 - Android: `JAVA_HOME=D:\nexus-build\android\jdk17`, `ANDROID_HOME=D:\nexus-build\android\sdk`,
-  `GRADLE_USER_HOME=D:/nexus-build/gradle`; `apps/android/android/app/build` é junção para
+  `GRADLE_USER_HOME=D:/nexus-build/gradle`; `apps/mobile/android/app/build` é junção para
   `D:\nexus-build\micnexus-android-out\app-build`.
 - npm: `npm_config_cache=D:/nexus-build/npm-cache`.
 - Preview da interface do Windows no navegador: `npx vite apps/desktop` (porta 1430) com

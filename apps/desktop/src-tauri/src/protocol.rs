@@ -13,6 +13,15 @@ pub const DISCOVERY_PORT: u16 = 47821;
 pub const BLUETOOTH_UUID: u128 = 0xa3c8e0f2_5b17_4d9a_8e61_0c4f2b9d7a15;
 pub const ANDROID_PACKAGE: &str = "app.micnexus.android";
 
+/// Bonjour service the iPhone app advertises.
+pub const BONJOUR_SERVICE: &str = "_micnexus._tcp.local";
+/// BLE GATT service on the iPhone, and its two characteristics (docs/PROTOCOL.md).
+pub const BLE_SERVICE: u128 = 0xa3c8e0f2_5b17_4d9a_8e61_0c4f2b9d7a16;
+/// PC → phone, write without response.
+pub const BLE_RX: u128 = 0xa3c8e0f2_5b17_4d9a_8e61_0c4f2b9d7a17;
+/// Phone → PC, notify.
+pub const BLE_TX: u128 = 0xa3c8e0f2_5b17_4d9a_8e61_0c4f2b9d7a18;
+
 pub const DISCOVER_REQUEST: &[u8; 4] = b"MNX?";
 pub const DISCOVER_REPLY: &[u8; 4] = b"MNX!";
 

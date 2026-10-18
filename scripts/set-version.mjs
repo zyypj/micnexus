@@ -31,9 +31,9 @@ const targets = [
   ["apps/desktop/src-tauri/Cargo.toml", /^version = "([^"]+)"/m, version],
   ["apps/desktop/src-tauri/tauri.conf.json", /"version": "([^"]+)"/, version],
   ["apps/desktop/package.json", /"version": "([^"]+)"/, version],
-  ["apps/android/package.json", /"version": "([^"]+)"/, version],
-  ["apps/android/android/app/build.gradle", /versionName "([^"]+)"/, version],
-  ["apps/android/android/app/build.gradle", /versionCode (\d+)/, String(versionCode)],
+  ["apps/mobile/package.json", /"version": "([^"]+)"/, version],
+  ["apps/mobile/android/app/build.gradle", /versionName "([^"]+)"/, version],
+  ["apps/mobile/android/app/build.gradle", /versionCode (\d+)/, String(versionCode)],
 ];
 
 let mismatches = 0;

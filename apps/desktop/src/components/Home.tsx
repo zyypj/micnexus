@@ -8,6 +8,8 @@ import { Icon } from "./Icon";
 import { MuteButton } from "./MuteButton";
 
 export const RELEASES_URL = "https://github.com/zyypj/micnexus/releases/latest";
+/** Apple's USB drivers for Windows (Microsoft Store), needed for iPhones on the cable. */
+const APPLE_DEVICES_URL = "https://apps.microsoft.com/detail/9np83lwlpz9k";
 
 const TRANSPORT_ICON: Record<Transport, IconName> = { wifi: "wifi", usb: "usb", bluetooth: "bluetooth" };
 const TRANSPORT_NAME: Record<Transport, string> = { wifi: "Wi‑Fi", usb: "Cabo USB", bluetooth: "Bluetooth" };
@@ -105,10 +107,12 @@ function usbStatus(devices: UsbDevice[], enabled: boolean, onHelp: () => void): 
       return { status: <>Toque em <b>Permitir</b> no aviso de depuração USB do {d.model}</>, tone: "warn" };
     case "no-app":
       return { status: <>Instale o MicNexus no {d.model}</>, tone: "warn" };
+    case "closed":
+      return { status: <>Abra o MicNexus no iPhone para conectar pelo cabo</>, tone: "warn" };
     case "offline":
       return { status: <>{d.model} não respondeu; reconecte o cabo</>, tone: "warn" };
     default:
-      return { status: <>{d.model} pelo cabo — abrindo o app…</>, tone: "ok" };
+      return { status: <>{d.model} pelo cabo — conectando…</>, tone: "ok" };
   }
 }
 
@@ -144,7 +148,7 @@ export function Waiting({ state, settings }: { state: DesktopState; settings: De
           </div>
         )}
         <button className="link small" onClick={() => open(RELEASES_URL)}>
-          Ainda não tem o app no celular? Baixe o APK
+          Ainda não tem o app no celular? Baixe para Android ou iPhone
         </button>
       </section>
 
@@ -162,7 +166,24 @@ export function Waiting({ state, settings }: { state: DesktopState; settings: De
                 : "Este PC não está em nenhuma rede"
           }
         />
-        <Row icon="usb" title="Cabo USB" tone={state.usb.state === "no-adb" ? "warn" : usb.tone} status={state.usb.state === "no-adb" ? "Componente adb não encontrado (reinstale o MicNexus)" : usb.status} />
+        <Row
+          icon="usb"
+          title="Cabo USB"
+          tone={state.usb.state === "no-adb" ? "warn" : usb.tone}
+          status={
+            <>
+              {state.usb.state === "no-adb" ? "Componente adb não encontrado (reinstale o MicNexus)" : usb.status}
+              {settings.usbEnabled && !state.usb.apple && (
+                <span className="sub-hint">
+                  iPhone pelo cabo: instale o app{" "}
+                  <button className="link" onClick={() => open(APPLE_DEVICES_URL)}>
+                    Dispositivos Apple
+                  </button>
+                </span>
+              )}
+            </>
+          }
+        />
         <Row
           icon="bluetooth"
           title="Bluetooth"
@@ -171,7 +192,7 @@ export function Waiting({ state, settings }: { state: DesktopState; settings: De
             !settings.bluetoothEnabled
               ? "Desativado nas configurações"
               : bt.state === "ready"
-                ? "Pareie o celular com este PC uma vez"
+                ? "Android: pareie uma vez · iPhone: toque em Bluetooth no app"
                 : bt.state === "off"
                   ? "O Bluetooth do PC está desligado"
                   : bt.state === "unsupported"

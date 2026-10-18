@@ -74,23 +74,23 @@ jobs:
           cache: npm
           cache-dependency-path: |
             package-lock.json
-            apps/android/package-lock.json
+            apps/mobile/package-lock.json
       - run: npm ci
       - name: "Install (the Android app has its own npm project; shared packages are file links)"
-        working-directory: apps/android
+        working-directory: apps/mobile
         run: npm ci
-      - working-directory: apps/android
+      - working-directory: apps/mobile
         run: npm run typecheck
-      - working-directory: apps/android
+      - working-directory: apps/mobile
         run: npx jest
       - uses: gradle/actions/setup-gradle@v4
       - name: Kotlin unit tests (protocol and session)
-        working-directory: apps/android/android
+        working-directory: apps/mobile/android
         run: ./gradlew :app:testDebugUnitTest --no-daemon
       - name: Assemble APK
-        working-directory: apps/android/android
+        working-directory: apps/mobile/android
         run: ./gradlew assembleRelease --no-daemon
       - uses: actions/upload-artifact@v4
         with:
           name: micnexus-android-apk
-          path: apps/android/android/app/build/outputs/apk/release/*.apk
+          path: apps/mobile/android/app/build/outputs/apk/release/*.apk

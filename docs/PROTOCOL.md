@@ -14,6 +14,36 @@ padrão (e liberar exige administrador). Conexões de saída e respostas unicast
 (janela de 3 s, padrão do Windows) passam sem configurar nada. O Android não tem firewall de
 entrada. O Bluetooth não passa pelo firewall, então ali o celular conecta no PC.
 
+### iPhone
+
+O iOS não deixa um app receber broadcast UDP (exige um direito especial da Apple), não tem adb
+nem Bluetooth clássico. Por isso, com iPhone:
+
+| Transporte | Quem abre a conexão | Como | Confiança |
+|---|---|---|---|
+| Wi‑Fi | **PC → iPhone** | o iPhone se anuncia por **Bonjour** (`_micnexus._tcp`); o PC pergunta por mDNS *legacy unicast* (de uma porta ≠ 5353, então a resposta vem em unicast e o firewall deixa passar) e abre o TCP | aprovar no PC na 1ª vez |
+| Cabo USB | **PC → iPhone** | **usbmuxd** (serviço "Apple Mobile Device" do app Dispositivos Apple/iTunes, `127.0.0.1:27015`): `Connect` à porta 47820 do iPhone | automática |
+| Bluetooth (BLE) | **PC → iPhone** | o iPhone é periférico GATT; o PC (central) vê o anúncio, conecta e troca os mesmos frames por duas características | aprovar no PC na 1ª vez |
+
+Como o iPhone não ouve a descoberta do PC, ele monta a lista de PCs pelos `INFO` que recebe: o PC
+conecta em cada iPhone encontrado a cada ~3 s (presença) e o iPhone responde `BYE idle` quando
+não quer aquele PC. O registro TXT do Bonjour traz `want` para o PC conectar na hora.
+
+**Bonjour** (`_micnexus._tcp`, porta 47820), TXT: `v=1`, `id=<id do celular>`, `name=<nome>`,
+`want=<id do PC>` (vazio se nenhum).
+
+**BLE:**
+
+| | UUID |
+|---|---|
+| Serviço | `a3c8e0f2-5b17-4d9a-8e61-0c4f2b9d7a16` |
+| `rx` (PC → iPhone, write without response) | `a3c8e0f2-5b17-4d9a-8e61-0c4f2b9d7a17` |
+| `tx` (iPhone → PC, notify) | `a3c8e0f2-5b17-4d9a-8e61-0c4f2b9d7a18` |
+
+As duas características carregam o **mesmo fluxo de bytes** do TCP, fatiado no MTU. O nome local
+do anúncio é `MNX*` (quer qualquer PC — o usuário tocou em "Bluetooth") ou `MNX` + os 8 primeiros
+caracteres do id do PC que ele quer. Codec no BLE: Opus 48 kHz (como no Bluetooth do Android).
+
 ## Constantes
 
 | Nome | Valor |

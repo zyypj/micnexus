@@ -1,11 +1,14 @@
 pub mod adb;
 pub mod audio;
+pub mod ble;
 pub mod bluetooth;
 pub mod cable;
 pub mod core;
 pub mod lan;
+pub mod mdns;
 pub mod protocol;
 pub mod settings;
+pub mod usbmux;
 
 use std::{
     sync::{
@@ -385,8 +388,11 @@ pub fn run() {
             core.refresh_outputs();
             core.restore_default_mic_after_crash();
             lan::start(core.clone());
+            mdns::start(core.clone());
             bluetooth::start(core.clone());
+            ble::start(core.clone());
             adb::start(core.clone(), app.path().resource_dir().ok());
+            usbmux::start(core.clone());
             {
                 // Audio endpoints come and go (VB-CABLE installed, headset plugged).
                 let core = core.clone();
