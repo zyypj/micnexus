@@ -1,0 +1,12 @@
+{
+  "name": "@micnexus/protocol",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MicNexus constants and the state shapes shared by the apps (wire format: docs/PROTOCOL.md)",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p ."
+  }
+}

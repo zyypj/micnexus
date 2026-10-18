@@ -1,0 +1,7 @@
+<resources>
+    <!-- Same as packages/ui colors. -->
+    <color name="nx_bg">#0A0C14</color>
+    <color name="nx_accent">#5468F5</color>
+    <color name="nx_accent2">#9B5CF6</color>
+    <color name="nx_danger">#F4506B</color>
+</resources>

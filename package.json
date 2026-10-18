@@ -1,0 +1,22 @@
+{
+  "name": "micnexus-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/protocol",
+    "packages/ui",
+    "apps/desktop"
+  ],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "desktop:dev": "npm run tauri dev --workspace @micnexus/desktop",
+    "desktop:build": "npm run tauri build --workspace @micnexus/desktop",
+    "icons": "node scripts/gen-icons.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2"
+  }
+}
